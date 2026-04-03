@@ -6,3 +6,9 @@ Thumbs.db
 # Secrets — never commit
 .env
 .env.*
+
+# Local runs
+out.json
+.venv/
+__pycache__/
+*.pyc

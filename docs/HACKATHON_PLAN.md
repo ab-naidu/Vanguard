@@ -2,6 +2,8 @@
 
 **Product direction (default):** Field / ops copilot — turn **site photos + vendor PDF/screenshots + short note** into **structured work order + BOM + risk flags**, using **Gemma 4** (multimodal + function calling). Adjust names if you pick another persona.
 
+**Repo status:** Day 0 narrative in **[JUDGE_ONE_PAGER.md](./JUDGE_ONE_PAGER.md)**. Vertical slice: `scripts/run_work_order.py`, `streamlit_app.py`, `vanguard/pipeline.py`.
+
 ---
 
 ## Day 0 — Before coding (~2 hours)
@@ -44,8 +46,8 @@
 
 **Definition of done (morning)**
 
-- [ ] One end-to-end path: UI or notebook → model → parsed JSON displayed.
-- [ ] One happy-path demo asset set (your own photos/PDFs, no copyright issues).
+- [x] One end-to-end path: UI or notebook → model → parsed JSON displayed. *(CLI + Streamlit + `vanguard` pipeline)*
+- [ ] One happy-path demo asset set (your own photos/PDFs, no copyright issues). *(add files under `sample_assets/` — not committed)*
 
 ---
 
