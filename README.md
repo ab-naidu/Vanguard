@@ -26,13 +26,37 @@ huggingface-cli login
 python scripts/run_work_order.py --mock -o out.json
 ```
 
-### Real inference
+### PyTorch with CUDA (laptop GPU)
 
-Default dev model id is **`google/gemma-3-4b-it`** (set **`VANGUARD_MODEL_ID`** for Gemma 4, e.g. `google/gemma-4-26B-A4B-it` — needs large GPU / Kaggle).
+Install a **CUDA** build of PyTorch that matches your driver (see [pytorch.org](https://pytorch.org/get-started/locally/)). Example (adjust CUDA version):
 
 ```bash
-python scripts/run_work_order.py --images sample_assets/a.jpg sample_assets/b.jpg --note "Replace seal" -o out.json
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
 ```
+
+Then reinstall other deps from `requirements.txt` if needed. Confirm GPU: `python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"`.
+
+### Real inference
+
+Default model id is **`google/gemma-3-4b-it`**. For a **Gemma 4** hackathon demo on GPU, set **`VANGUARD_MODEL_ID`** (and use a recent `transformers`):
+
+```bash
+set VANGUARD_MODEL_ID=google/gemma-4-e4b-it
+python scripts/run_work_order.py --images sample_assets\a.jpg --note "Replace seal" -o out.json
+```
+
+### GPU: laptop vs Kaggle (rough guide)
+
+VRAM is approximate; quantization, batch size, and context length change fit.
+
+| Where | Typical GPU | Good Gemma 4 picks |
+|--------|-------------|-------------------|
+| **Kaggle notebook** | Often **T4 ~16 GB** | **`google/gemma-4-e2b-it`** or **`google/gemma-4-e4b-it`**; upgrade `transformers`; use short context for demo. |
+| **Laptop 8–12 GB** | RTX 3060 laptop, etc. | **`google/gemma-4-e2b-it`** or stay on **`gemma-3-4b-it`** if downloads or VRAM bite. |
+| **Laptop 16–24 GB** | RTX 4080 laptop, etc. | **`google/gemma-4-e4b-it`**; try **26B A4B** only if you add **4-bit** / aggressive offload (not in this repo by default). |
+| **Desktop 24+ GB** | RTX 3090/4090, etc. | **`google/gemma-4-26B-A4B-it`** is realistic for many setups; **`gemma-4-31B-it`** needs more headroom. |
+
+**Kaggle tips:** Turn on the **GPU** accelerator, put **`HF_TOKEN`** in notebook secrets, `pip install -U transformers`, clone or copy `vanguard/` + `scripts/` into the notebook, and run the same pipeline. Expect session time limits — keep `max_new_tokens` moderate.
 
 ### Streamlit demo
 
@@ -46,8 +70,9 @@ Use **Mock mode** in the sidebar if you have no GPU.
 
 | Model | Role |
 |--------|------|
-| `google/gemma-3-4b-it` | Default for smaller GPUs / local dev |
-| `google/gemma-4-26B-A4B-it` | Hackathon target when you have the hardware or Kaggle |
+| `google/gemma-3-4b-it` | Default in code; smallest friction if Gemma 4 + latest `transformers` is painful |
+| `google/gemma-4-e2b-it` / `google/gemma-4-e4b-it` | **Gemma 4** on **Kaggle T4** or **12–16 GB** laptop GPUs |
+| `google/gemma-4-26B-A4B-it` | MoE “hero” model when you have **~24 GB+** VRAM (or quantize) |
 
 Use **`enable_thinking=False`** in code for faster demos unless the track scores reasoning. Image order is **images first**, then text (see [Gemma 4 model card](https://ai.google.dev/gemma/docs/core/model_card_4)).
 
