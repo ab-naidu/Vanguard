@@ -13,12 +13,14 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-**Hugging Face:** Gemma weights are gated. Accept the license on the model page, then:
+**Hugging Face:** Gemma weights are gated. Accept the license on the model page, then sign in on the CLI:
 
-```bash
-huggingface-cli login
-# or set HF_TOKEN for CI
+```powershell
+hf auth login
+# or set HF_TOKEN for CI / notebooks
 ```
+
+Check: `hf auth whoami`.
 
 ### Mock run (no GPU, no download)
 
@@ -28,13 +30,16 @@ python scripts/run_work_order.py --mock -o out.json
 
 ### PyTorch with CUDA (laptop GPU)
 
-Install a **CUDA** build of PyTorch that matches your driver (see [pytorch.org](https://pytorch.org/get-started/locally/)). Example (adjust CUDA version):
+Install a **CUDA** build of PyTorch (see [pytorch.org](https://pytorch.org/get-started/locally/)). **`pip install -r requirements.txt` often pulls CPU-only torch** — reinstall the GPU wheel after:
 
-```bash
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+```powershell
+pip uninstall -y torch torchvision
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
 ```
 
-Then reinstall other deps from `requirements.txt` if needed. Confirm GPU: `python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"`.
+**NVIDIA RTX 50-series (e.g. 5060 Laptop, sm_120):** use the **cu128** index above. Older cu124/cu126 builds can show `cudaErrorNoKernelImageForDevice` on GPU tensors.
+
+Confirm: `python -c "import torch; x=torch.zeros(1,device='cuda'); print(x+1)"`.
 
 ### Real inference
 
